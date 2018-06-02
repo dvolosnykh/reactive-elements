@@ -30,7 +30,7 @@ struct Tracer
     std::cout << '[' << *this << " copy-constructed from " << other << ']' << std::endl;
   }
 
-  template<typename U, typename = typename std::enable_if<not std::is_same<T, U>::value, int>::type>
+  template<typename U, typename = typename std::enable_if<not std::is_same<T, U>::value, void>::type>
   Tracer(const Tracer<U> & other)
   {
     std::cout << '[' << *this << " copy-constructed from " << other << ']' << std::endl;
@@ -50,7 +50,7 @@ struct Tracer
     return *this;
   }
 
-  template<typename U, typename = typename std::enable_if<not std::is_same<T, U>::value, int>::type>
+  template<typename U, typename = typename std::enable_if<not std::is_same<T, U>::value, void>::type>
   Tracer & operator = (const Tracer<U> & other)
   {
     std::cout << '[' << *this << " copy-assigned from " << other << ']' << std::endl;

@@ -3,30 +3,21 @@
 
 struct A
 {
-  Tracer<A> tracer;
 };
+
+#define A Tracer<A>
 
 struct B
 {
-  Tracer<B> tracer;
-
   B() = default;
-  B(A && a) : tracer(std::move(a.tracer)) {}
-  B(const A & a) : tracer(a.tracer) {}
+  B(A &&) {}
+  B(const A &) {}
 
-
-  B & operator = (A && a)
-  {
-    tracer = std::move(a.tracer);
-    return *this;
-  }
-
-  B & operator = (const A & a)
-  {
-    tracer = a.tracer;
-    return *this;
-  }
+  B & operator = (A &&) { return *this; }
+  B & operator = (const A &) { return *this; }
 };
+
+#define B Tracer<B>
 
 int main()
 {
