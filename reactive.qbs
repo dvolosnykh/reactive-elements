@@ -1,7 +1,7 @@
 import qbs
 
 Project {
-  minimumQbsVersion: "1.7.1"
+  minimumQbsVersion: "1.5.2"
 
   CppApplication {
     name: "tracer_demo"
