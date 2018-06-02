@@ -7,6 +7,7 @@ Project {
     name: "tracer_demo"
     consoleApplication: true
     cpp.cxxLanguageVersion: "c++11"
+    cpp.minimumMacosVersion: "10.7"
     files: [
       "tracer.hpp",
       "tracer_demo.cpp"
@@ -17,6 +18,7 @@ Project {
     name: "functional"
     consoleApplication: true
     cpp.cxxLanguageVersion: "c++11"
+    cpp.minimumMacosVersion: "10.7"
     files: [
       "subject.hpp",
       "tracer.hpp",
@@ -28,6 +30,7 @@ Project {
     name: "shared"
     consoleApplication: true
     cpp.cxxLanguageVersion: "c++11"
+    cpp.minimumMacosVersion: "10.7"
     files: [
       "subject.hpp",
       "shared.cpp"
