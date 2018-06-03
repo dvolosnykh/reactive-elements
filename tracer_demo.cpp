@@ -1,8 +1,11 @@
 #include "tracer.hpp"
 #include <iostream>
+#include <vector>
 
 struct A
 {
+  A() = default;
+  A(int, int) {}
 };
 
 #define A Tracer<A>
@@ -19,6 +22,21 @@ struct B
 
 #define B Tracer<B>
 
+struct V
+{
+  V() = default;
+  V(std::vector<int> &&) {}
+  V(const std::vector<int> &) {}
+
+  V & operator = (std::vector<int> &&) { return *this; }
+  V & operator = (const std::vector<int> &) { return *this; }
+};
+
+#define V Tracer<V>
+
+struct C {};
+
+
 int main()
 {
   {
@@ -28,6 +46,7 @@ int main()
     a2 = a1;
     A a3 = std::move(a1);
     a3 = std::move(a2);
+    A a4(1, 1);
   }
 
   {
@@ -46,5 +65,14 @@ int main()
     b1 = a;
     B b2 = std::move(a);
     b2 = std::move(a);
+  }
+
+  {
+    std::cout << "--- demo for different but compatible types ---" << std::endl;
+    std::vector<int> a;
+    V v1 = a;
+    v1 = a;
+    V v2 = std::move(a);
+    v2 = std::move(a);
   }
 }

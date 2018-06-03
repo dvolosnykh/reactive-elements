@@ -5,13 +5,13 @@
 
 struct Printer
 {
-  Tracer<Printer> tracer;
-
   void operator()(std::size_t value) const
   {
     std::cout << "Printer: " << value << std::endl;
   }
 };
+
+#define Printer Tracer<Printer>
 
 
 int main()
