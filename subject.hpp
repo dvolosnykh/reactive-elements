@@ -15,7 +15,7 @@
 
 namespace detail
 {
-  template<typename ...Args>
+  template<typename... Args>
   using Reaction = std::function<void(Args...)>;
 
 
@@ -36,7 +36,7 @@ namespace detail
   // erasing any difference between types and objects. The strange behaviour
   // appears while using object created as a result of calling std::bind,
   // for example. Even in this case, you may consider using lambda instead.
-  template<typename ...Args>
+  template<typename... Args>
   inline
   const std::type_info & compareAgent(const Reaction<Args...> & observer)
   {
@@ -54,18 +54,18 @@ namespace detail
   // NOTE: Observer is expected to support operator(Args...). If not, you shall provide
   // apply() specialization for your particular observer type which handles Args...
   // in an appropriate manner.
-  template<typename Observer, typename ...Args>
+  template<typename Observer, typename... Args>
   inline
-  void apply(const Observer & observer, Args && ...args)
+  void apply(const Observer & observer, Args &&... args)
   {
     observer(std::forward<Args>(args)...);
   }
 
   // NOTE: For some reason deduction fails if args is declared as Args && like in all
   // other similar places.
-  template<typename Observer, typename ...Args>
+  template<typename Observer, typename... Args>
   inline
-  void apply(const std::weak_ptr<Observer> & observer, Args ...args)
+  void apply(const std::weak_ptr<Observer> & observer, Args... args)
   {
     if (const auto o = observer.lock()) {
       (*o)(std::forward<Args>(args)...);
@@ -73,7 +73,7 @@ namespace detail
   }
 
 
-  template<typename Observer, typename ...Args>
+  template<typename Observer, typename... Args>
   class Subject
   {
   public:
@@ -101,7 +101,7 @@ namespace detail
       m_observers.erase(std::move(erase_iter), std::end(m_observers));
     }
 
-    void notify(Args && ...args) const
+    void notify(Args &&... args) const
     {
       // TODO: Add support for removing expired observers on behalf of shared variant of API.
       for (const auto & observer : m_observers) {
@@ -145,13 +145,13 @@ AttachGuard<Subject> makeAttachGuard(Subject & subject, const Observer & observe
 
 namespace functional
 {
-  template<typename ...Args>
+  template<typename... Args>
   class Subject : public detail::Subject<detail::Reaction<Args...>, Args...> {};
 }
 
 namespace shared
 {
-  template<typename ...Args>
+  template<typename... Args>
   class Subject : public detail::Subject<std::weak_ptr<detail::Reaction<Args...>>, Args...>
   {
   public:

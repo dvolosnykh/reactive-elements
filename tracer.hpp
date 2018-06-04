@@ -16,7 +16,7 @@ std::string typeName()
 
 
 
-template<typename ...Args>
+template<typename... Args>
 class ArgumentsPrinter
 {
   using Arguments = std::tuple<Args...>;
@@ -25,7 +25,7 @@ class ArgumentsPrinter
   using Argument = typename std::tuple_element<I, Arguments>::type;
 
 public:
-  explicit ArgumentsPrinter(Args ...args)
+  explicit ArgumentsPrinter(Args... args)
     : args(std::move(args)...)
   {}
 
@@ -79,7 +79,7 @@ public:
   }
 
   template<typename ...Args>
-  Tracer(Args ...args)
+  Tracer(Args... args)
     : T(args...)
   {
     std::cout << "[" << *this
