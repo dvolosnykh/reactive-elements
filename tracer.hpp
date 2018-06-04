@@ -34,17 +34,18 @@ void printArgs(Arg arg, Args ...args)
 
 
 template<typename T>
-struct Tracer
+struct Tracer : T
 {
   Tracer()
-    : object()
+    : T()
   {
-    std::cout << '[' << *this << " default-constructed]" << std::endl;
+    std::cout << '[' << *this
+      << " default-constructed]" << std::endl;
   }
 
   template<typename ...Args>
   Tracer(Args ...args)
-    : object(args...)
+    : T(args...)
   {
     std::cout << '[' << *this << " constructed with (";
     printArgs(args...);
@@ -60,28 +61,36 @@ struct Tracer
   // Support the same type wrapped by Tracer.
 
   Tracer(Tracer && other)
-    : object(std::move(other.object))
+    : T(std::move(other))
   {
-    std::cout << '[' << *this << " move-constructed from same-typed " << other << ']' << std::endl;
+    std::cout << '[' << *this
+      << " move-constructed from "
+      << other << ']' << std::endl;
   }
 
   Tracer(const Tracer & other)
-    : object(other.object)
+    : T(other)
   {
-    std::cout << '[' << *this << " copy-constructed from same-typed " << other << ']' << std::endl;
+    std::cout << '[' << *this
+      << " copy-constructed from "
+      << other << ']' << std::endl;
   }
 
-  Tracer & operator = (Tracer && other)
+  Tracer & operator=(Tracer && other)
   {
-    object = std::move(other.object);
-    std::cout << '[' << *this << " move-assigned from same-typed " << other << ']' << std::endl;
+    T::operator=(std::move(other));
+    std::cout << '[' << *this
+      << " move-assigned from "
+      << other << ']' << std::endl;
     return *this;
   }
 
-  Tracer & operator = (const Tracer & other)
+  Tracer & operator=(const Tracer & other)
   {
-    object = other.object;
-    std::cout << '[' << *this << " copy-assigned from same-typed " << other << ']' << std::endl;
+    T::operator=(other);
+    std::cout << '[' << *this
+      << " copy-assigned from "
+      << other << ']' << std::endl;
     return *this;
   }
 
@@ -90,64 +99,82 @@ struct Tracer
 
   template<typename U>
   Tracer(Tracer<U> && other)
-    : object(std::move(other))
+    : T(std::move(other))
   {
-    std::cout << '[' << *this << " move-constructed from different-typed " << other << ']' << std::endl;
+    std::cout << '[' << *this
+      << " move-constructed from "
+      << other << ']' << std::endl;
   }
 
   template<typename U>
   Tracer(const Tracer<U> & other)
-    : object(other)
+    : T(other)
   {
-    std::cout << '[' << *this << " copy-constructed from different-typed " << other << ']' << std::endl;
+    std::cout << '[' << *this
+      << " copy-constructed from "
+      << other << ']' << std::endl;
   }
 
   template<typename U>
-  Tracer & operator = (Tracer<U> && other)
+  Tracer & operator=(Tracer<U> && other)
   {
-    object = std::move(other);
-    std::cout << '[' << *this << " move-assigned from different-typed " << other << ']' << std::endl;
+    T::operator=(std::move(other));
+    std::cout << '[' << *this
+      << " move-assigned from "
+      << other << ']' << std::endl;
     return *this;
   }
 
   template<typename U>
-  Tracer & operator = (const Tracer<U> & other)
+  Tracer & operator=(const Tracer<U> & other)
   {
-    object = other;
-    std::cout << '[' << *this << " copy-assigned from different-typed " << other << ']' << std::endl;
+    T::operator=(other);
+    std::cout << '[' << *this
+      << " copy-assigned from "
+      << other << ']' << std::endl;
     return *this;
   }
 
 
   // Support for custom types.
 
-  template<typename U, typename = typename std::enable_if<not std::is_lvalue_reference<U>::value>::type>
+  template<typename U,
+    typename = typename std::enable_if<not std::is_lvalue_reference<U>::value>::type>
   Tracer(U && other)
-    : object(std::move(other))
+    : T(std::move(other))
   {
-    std::cout << '[' << *this << " move-constructed from non-traced " << typeName<U>() << ']' << std::endl;
+    std::cout << '[' << *this
+      << " move-constructed from non-traced "
+      << typeName<U>() << ']' << std::endl;
   }
 
   template<typename U>
   Tracer(const U & other)
-    : object(other)
+    : T(other)
   {
-    std::cout << '[' << *this << " copy-constructed from non-traced " << typeName<U>() << ']' << std::endl;
+    std::cout << '[' << *this
+      << " copy-constructed from non-traced "
+      << typeName<U>() << ']' << std::endl;
   }
 
-  template<typename U, typename = typename std::enable_if<not std::is_lvalue_reference<U>::value>::type>
-  Tracer & operator = (U && other)
+  template<typename U,
+    typename = typename std::enable_if<not std::is_lvalue_reference<U>::value>::type>
+  Tracer & operator=(U && other)
   {
-    object = std::move(other);
-    std::cout << '[' << *this << " move-assigned from non-traced " << typeName<U>() << ']' << std::endl;
+    T::operator=(std::move(other));
+    std::cout << '[' << *this
+      << " move-assigned from non-traced "
+      << typeName<U>() << ']' << std::endl;
     return *this;
   }
 
   template<typename U>
-  Tracer & operator = (const U & other)
+  Tracer & operator=(const U & other)
   {
-    object = other;
-    std::cout << '[' << *this << " copy-assigned from non-traced " << typeName<U>() << ']' << std::endl;
+    T::operator=(other);
+    std::cout << '[' << *this
+      << " copy-assigned from non-traced "
+      << typeName<U>() << ']' << std::endl;
     return *this;
   }
 
@@ -158,10 +185,6 @@ private:
   }
 
 private:
-  template<typename U>
-  friend struct Tracer;
-  T object;
-
   static const std::string name;
   static std::size_t counter;
   const decltype(counter) id{++counter};
