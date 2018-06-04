@@ -4,8 +4,10 @@
 #include "ArgumentsPrinter.hpp"
 
 
+struct TracerBase {};
+
 template<typename T>
-class Tracer : public T
+class Tracer : public T, TracerBase
 {
 public:
   Tracer()
@@ -15,7 +17,7 @@ public:
       << " default-constructed]" << std::endl;
   }
 
-  template<typename ...Args>
+  template<typename... Args>
   Tracer(Args... args)
     : T(args...)
   {
@@ -112,7 +114,10 @@ public:
   // Support for custom types.
 
   template<typename U,
-    typename = typename std::enable_if<not std::is_lvalue_reference<U>::value>::type>
+    typename = typename std::enable_if<
+      not std::is_base_of<TracerBase, U>::value and
+      not std::is_lvalue_reference<U>::value
+    >::type>
   Tracer(U && other)
     : T(std::move(other))
   {
@@ -121,7 +126,10 @@ public:
       << typeName<U>() << "]" << std::endl;
   }
 
-  template<typename U>
+  template<typename U,
+    typename = typename std::enable_if<
+      not std::is_base_of<TracerBase, U>::value
+    >::type>
   Tracer(const U & other)
     : T(other)
   {
@@ -131,7 +139,10 @@ public:
   }
 
   template<typename U,
-    typename = typename std::enable_if<not std::is_lvalue_reference<U>::value>::type>
+    typename = typename std::enable_if<
+      not std::is_base_of<TracerBase, U>::value and
+      not std::is_lvalue_reference<U>::value
+    >::type>
   Tracer & operator=(U && other)
   {
     T::operator=(std::move(other));
@@ -141,7 +152,10 @@ public:
     return *this;
   }
 
-  template<typename U>
+  template<typename U,
+    typename = typename std::enable_if<
+      not std::is_base_of<TracerBase, U>::value
+    >::type>
   Tracer & operator=(const U & other)
   {
     T::operator=(other);
