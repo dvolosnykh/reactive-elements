@@ -1,45 +1,80 @@
 #pragma once
 
 #include <iostream>
+#include <tuple>
 #include <typeinfo>
 #include <boost/core/demangle.hpp>
 
 
+
 template<typename T>
-static inline
+inline
 std::string typeName()
 {
   return boost::core::demangle(typeid(T).name());
 }
 
 
-static inline
-void printArgs() {}
 
-template<typename Arg>
-static inline
-void printArgs(Arg arg)
+template<typename ...Args>
+class ArgumentsPrinter
 {
-  std::cout << typeName<Arg>() << '=' << arg;
-}
+  using Arguments = std::tuple<Args...>;
 
-template<typename Arg, typename ...Args>
-static inline
-void printArgs(Arg arg, Args ...args)
-{
-  printArgs(arg);
-  std::cout << ", ";
-  printArgs(args...);
-}
+  template<std::size_t I>
+  using Argument = typename std::tuple_element<I, Arguments>::type;
+
+public:
+  explicit ArgumentsPrinter(Args ...args)
+    : args(std::move(args)...)
+  {}
+
+  void operator()(std::ostream & out) const { print<>(out); }
+
+private:
+  template<std::size_t I>
+  static constexpr
+  bool isLastArgument()
+  {
+    return I >= std::tuple_size<Arguments>::value - 1;
+  }
+
+  template<std::size_t I = 0>
+  typename std::enable_if<not isLastArgument<I>()>::type
+  print(std::ostream & out) const
+  {
+    out << typeName<Argument<I>>() << " = " << std::get<I>(args) << ", ";
+    print<I + 1>(out);
+  }
+
+  template<std::size_t I = 0>
+  typename std::enable_if<isLastArgument<I>()>::type
+  print(std::ostream & out) const
+  {
+    out << typeName<Argument<I>>() << " = " << std::get<I>(args);
+  }
+
+  friend
+  std::ostream & operator<<(std::ostream & out, const ArgumentsPrinter & printer)
+  {
+    printer(out);
+    return out;
+  }
+
+private:
+  Arguments args;
+};
+
 
 
 template<typename T>
-struct Tracer : T
+class Tracer : public T
 {
+public:
   Tracer()
     : T()
   {
-    std::cout << '[' << *this
+    std::cout << "[" << *this
       << " default-constructed]" << std::endl;
   }
 
@@ -47,14 +82,15 @@ struct Tracer : T
   Tracer(Args ...args)
     : T(args...)
   {
-    std::cout << '[' << *this << " constructed with (";
-    printArgs(args...);
-    std::cout << ")]" << std::endl;
+    std::cout << "[" << *this
+      << " constructed with ("
+      << ArgumentsPrinter<Args...>(args...)
+      << ")]" << std::endl;
   }
 
   ~Tracer()
   {
-    std::cout << '[' << *this << " destructed]" << std::endl;
+    std::cout << "[" << *this << " destructed]" << std::endl;
   }
 
 
@@ -63,34 +99,34 @@ struct Tracer : T
   Tracer(Tracer && other)
     : T(std::move(other))
   {
-    std::cout << '[' << *this
-      << " move-constructed from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " move-constructed from traced "
+      << other << "]" << std::endl;
   }
 
   Tracer(const Tracer & other)
     : T(other)
   {
-    std::cout << '[' << *this
-      << " copy-constructed from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " copy-constructed from traced "
+      << other << "]" << std::endl;
   }
 
   Tracer & operator=(Tracer && other)
   {
     T::operator=(std::move(other));
-    std::cout << '[' << *this
-      << " move-assigned from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " move-assigned from traced "
+      << other << "]" << std::endl;
     return *this;
   }
 
   Tracer & operator=(const Tracer & other)
   {
     T::operator=(other);
-    std::cout << '[' << *this
-      << " copy-assigned from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " copy-assigned from traced "
+      << other << "]" << std::endl;
     return *this;
   }
 
@@ -101,27 +137,27 @@ struct Tracer : T
   Tracer(Tracer<U> && other)
     : T(std::move(other))
   {
-    std::cout << '[' << *this
-      << " move-constructed from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " move-constructed from traced "
+      << other << "]" << std::endl;
   }
 
   template<typename U>
   Tracer(const Tracer<U> & other)
     : T(other)
   {
-    std::cout << '[' << *this
-      << " copy-constructed from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " copy-constructed from traced "
+      << other << "]" << std::endl;
   }
 
   template<typename U>
   Tracer & operator=(Tracer<U> && other)
   {
     T::operator=(std::move(other));
-    std::cout << '[' << *this
-      << " move-assigned from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " move-assigned from traced "
+      << other << "]" << std::endl;
     return *this;
   }
 
@@ -129,9 +165,9 @@ struct Tracer : T
   Tracer & operator=(const Tracer<U> & other)
   {
     T::operator=(other);
-    std::cout << '[' << *this
-      << " copy-assigned from "
-      << other << ']' << std::endl;
+    std::cout << "[" << *this
+      << " copy-assigned from traced "
+      << other << "]" << std::endl;
     return *this;
   }
 
@@ -143,18 +179,18 @@ struct Tracer : T
   Tracer(U && other)
     : T(std::move(other))
   {
-    std::cout << '[' << *this
+    std::cout << "[" << *this
       << " move-constructed from non-traced "
-      << typeName<U>() << ']' << std::endl;
+      << typeName<U>() << "]" << std::endl;
   }
 
   template<typename U>
   Tracer(const U & other)
     : T(other)
   {
-    std::cout << '[' << *this
+    std::cout << "[" << *this
       << " copy-constructed from non-traced "
-      << typeName<U>() << ']' << std::endl;
+      << typeName<U>() << "]" << std::endl;
   }
 
   template<typename U,
@@ -162,9 +198,9 @@ struct Tracer : T
   Tracer & operator=(U && other)
   {
     T::operator=(std::move(other));
-    std::cout << '[' << *this
+    std::cout << "[" << *this
       << " move-assigned from non-traced "
-      << typeName<U>() << ']' << std::endl;
+      << typeName<U>() << "]" << std::endl;
     return *this;
   }
 
@@ -172,16 +208,17 @@ struct Tracer : T
   Tracer & operator=(const U & other)
   {
     T::operator=(other);
-    std::cout << '[' << *this
+    std::cout << "[" << *this
       << " copy-assigned from non-traced "
-      << typeName<U>() << ']' << std::endl;
+      << typeName<U>() << "]" << std::endl;
     return *this;
   }
 
 private:
-  friend std::ostream & operator << (std::ostream & out, const Tracer & tracer)
+  friend
+  std::ostream & operator<<(std::ostream & out, const Tracer & tracer)
   {
-    return out << tracer.name << '.' << tracer.id;
+    return out << tracer.name << "." << tracer.id;
   }
 
 private:
