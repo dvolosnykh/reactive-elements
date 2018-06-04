@@ -9,7 +9,9 @@ Project {
     cpp.cxxLanguageVersion: "c++11"
     cpp.minimumMacosVersion: "10.7"
     files: [
-      "tracer.hpp",
+      "typename.hpp",
+      "ArgumentsPrinter.hpp",
+      "Tracer.hpp",
       "tracer_demo.cpp"
     ]
   }
@@ -20,8 +22,10 @@ Project {
     cpp.cxxLanguageVersion: "c++11"
     cpp.minimumMacosVersion: "10.7"
     files: [
-      "subject.hpp",
-      "tracer.hpp",
+      "typename.hpp",
+      "ArgumentsPrinter.hpp",
+      "Tracer.hpp",
+      "Subject.hpp",
       "functional.cpp"
     ]
   }
@@ -32,7 +36,7 @@ Project {
     cpp.cxxLanguageVersion: "c++11"
     cpp.minimumMacosVersion: "10.7"
     files: [
-      "subject.hpp",
+      "Subject.hpp",
       "shared.cpp"
     ]
   }
