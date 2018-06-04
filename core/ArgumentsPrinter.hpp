@@ -22,13 +22,20 @@ public:
 private:
   template<std::size_t I>
   static constexpr
+  bool isEmpty()
+  {
+    return std::tuple_size<Arguments>::value == 0;
+  }
+
+  template<std::size_t I>
+  static constexpr
   bool isLastArgument()
   {
     return I >= std::tuple_size<Arguments>::value - 1;
   }
 
   template<std::size_t I = 0>
-  typename std::enable_if<not isLastArgument<I>()>::type
+  typename std::enable_if<not isEmpty<I>() and not isLastArgument<I>()>::type
   print(std::ostream & out) const
   {
     out << typeName<Argument<I>>() << " = " << std::get<I>(args) << ", ";
@@ -36,11 +43,15 @@ private:
   }
 
   template<std::size_t I = 0>
-  typename std::enable_if<isLastArgument<I>()>::type
+  typename std::enable_if<not isEmpty<I>() and isLastArgument<I>()>::type
   print(std::ostream & out) const
   {
     out << typeName<Argument<I>>() << " = " << std::get<I>(args);
   }
+
+  template<std::size_t I = 0>
+  typename std::enable_if<isEmpty<I>()>::type
+  print(std::ostream &) const {}
 
   friend
   std::ostream & operator<<(std::ostream & out, const ArgumentsPrinter & printer)
