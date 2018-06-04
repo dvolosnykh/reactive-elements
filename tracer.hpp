@@ -13,6 +13,26 @@ std::string typeName()
 }
 
 
+static inline
+void printArgs() {}
+
+template<typename Arg>
+static inline
+void printArgs(Arg arg)
+{
+  std::cout << typeName<Arg>() << '=' << arg;
+}
+
+template<typename Arg, typename ...Args>
+static inline
+void printArgs(Arg arg, Args ...args)
+{
+  printArgs(arg);
+  std::cout << ", ";
+  printArgs(args...);
+}
+
+
 template<typename T>
 struct Tracer
 {
@@ -132,22 +152,6 @@ struct Tracer
   }
 
 private:
-  template<typename Arg, typename ...Args>
-  static
-  void printArgs(Arg arg, Args ...args)
-  {
-    printArgs(arg);
-    std::cout << ", ";
-    printArgs(args...);
-  }
-
-  template<typename Arg>
-  static
-  void printArgs(Arg arg)
-  {
-    std::cout << typeName<Arg>() << '=' << arg;
-  }
-
   friend std::ostream & operator << (std::ostream & out, const Tracer & tracer)
   {
     return out << tracer.name << '.' << tracer.id;
