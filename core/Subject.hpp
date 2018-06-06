@@ -103,13 +103,12 @@ namespace detail
 
     void notify(Args &&... args) const
     {
-      // TODO: Add support for removing expired observers on behalf of shared variant of API.
       for (const auto & observer : m_observers) {
         apply(observer, args...);
       }
     }
 
-  private:
+  protected:
     std::deque<Observer> m_observers;
   };
 }
@@ -154,6 +153,8 @@ namespace shared
   template<typename... Args>
   class Subject : public detail::Subject<std::weak_ptr<detail::Reaction<Args...>>, Args...>
   {
+    using Base = detail::Subject<std::weak_ptr<detail::Reaction<Args...>>, Args...>;
+
   public:
     // NOTE: This method may technically be static, but it is declared const instead
     // in order to force its usage via existing Subject instances instead of
@@ -164,6 +165,25 @@ namespace shared
     auto createObserver(detail::Reaction<Args...> f) const -> std::shared_ptr<decltype(f)>
     {
       return std::make_shared<decltype(f)>(std::move(f));
+    }
+
+    void notify(Args &&... args) const
+    {
+      Base::notify(std::move(args)...);
+      const_cast<Subject*>(this)->removeExpiredObservers();
+    }
+
+  private:
+    void removeExpiredObservers()
+    {
+      auto & observers = this->m_observers;
+      auto erase_iter = std::remove_if(
+        std::begin(observers), std::end(observers),
+        [] (const typename Base::ObserverType & current) {
+          return current.lock() == nullptr;
+        }
+      );
+      observers.erase(std::move(erase_iter), std::end(observers));
     }
   };
 }
