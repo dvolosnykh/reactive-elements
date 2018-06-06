@@ -4,14 +4,6 @@
 #include <deque>
 #include <memory>
 
-#include <iostream>
-
-
-// TODO: Use detection idiom to derive container type which suites best depending
-// on Observer type details described below.
-// * If it supports hash(), then use std::unordered_set.
-// * else if it supports operator<, then use std::set.
-// * else use std::deque.
 
 namespace detail
 {
@@ -92,12 +84,21 @@ namespace detail
     void detach(const Observer & observer)
     {
       const auto & detached_agent = compareAgent(observer);
+
+      // SUGGESTION: remove_if algorithm may be replaced with an alternative
+      // one which moves only part of elements in order to fill 'holes'
+      // resulting from previously removed elements. Thus, order of
+      // elements guarantee will be lost. The advantage, though, is
+      // that the number of moved elements may decrease drastically.
+      // This advantage may be escalated in case elements' type is not
+      // movable. In this case less copies will be made.
       auto erase_iter = std::remove_if(
         std::begin(m_observers), std::end(m_observers),
         [&detached_agent] (const Observer & current) {
           return compareAgent(current) == detached_agent;
         }
       );
+
       m_observers.erase(std::move(erase_iter), std::end(m_observers));
     }
 
@@ -109,6 +110,13 @@ namespace detail
     }
 
   protected:
+    // TODO: Derive container type which suites best depending on Observer
+    // type details described below.
+    // * If it supports hash(), then use std::unordered_set.
+    // * else if it supports operator<, then use std::set.
+    // * else use std::deque.
+    // Note that for the case of functional API multi- counterparts of associative
+    // containers are required since several observers may have the same type.
     std::deque<Observer> m_observers;
   };
 }
