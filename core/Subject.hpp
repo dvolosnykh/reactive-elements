@@ -179,8 +179,9 @@ namespace shared
       auto & observers = this->m_observers;
       auto erase_iter = std::remove_if(
         std::begin(observers), std::end(observers),
-        [] (const typename Base::ObserverType & current) {
-          return current.lock() == nullptr;
+        [] (const typename Base::ObserverType & observer_weak) {
+          const auto observer = observer_weak.lock();
+          return not observer;
         }
       );
       observers.erase(std::move(erase_iter), std::end(observers));
