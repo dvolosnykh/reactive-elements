@@ -14,6 +14,7 @@ CommonProduct {
 
   Export {
     Depends { name: "cpp" }
+    Depends { name: "boost" }
     cpp.includePaths: FileInfo.joinPaths(product.sourceDirectory, "..")
   }
 }
