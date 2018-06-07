@@ -100,6 +100,8 @@ namespace detail
       );
 
       m_observers.erase(std::move(erase_iter), std::end(m_observers));
+
+      m_observers.shrink_to_fit();
     }
 
     void notify(Args &&... args) const
