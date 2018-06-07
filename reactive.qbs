@@ -5,8 +5,7 @@ Project {
   qbsSearchPaths: "."
   references: [
     "core/Core.qbs",
-    "tracer_demo/TracerDemo.qbs",
-    "functional/Functional.qbs",
-    "shared/Shared.qbs"
+    "reactive_demo/ReactiveDemo.qbs",
+    "tracer_demo/TracerDemo.qbs"
   ]
 }
