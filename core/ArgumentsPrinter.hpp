@@ -1,20 +1,21 @@
 #pragma once
 
 #include "typename.hpp"
+#include <functional>
 #include <tuple>
 
 
 template<typename... Args>
 class ArgumentsPrinter
 {
-  using Arguments = std::tuple<Args...>;
+  using Arguments = std::tuple<std::reference_wrapper<const Args>...>;
 
   template<std::size_t I>
-  using Argument = typename std::tuple_element<I, Arguments>::type;
+  using Argument = typename std::tuple_element<I, Arguments>::type::type;
 
 public:
-  explicit ArgumentsPrinter(Args... args)
-    : args(std::move(args)...)
+  explicit ArgumentsPrinter(const Args &... args)
+    : args(std::cref(args)...)
   {}
 
   void operator()(std::ostream & out) const { print<>(out); }
@@ -38,7 +39,7 @@ private:
   typename std::enable_if<not isEmpty<I>() and not isLastArgument<I>()>::type
   print(std::ostream & out) const
   {
-    out << typeName<Argument<I>>() << " = " << std::get<I>(args) << ", ";
+    out << typeName<Argument<I>>() << " = " << std::get<I>(args).get() << ", ";
     print<I + 1>(out);
   }
 
@@ -46,12 +47,13 @@ private:
   typename std::enable_if<not isEmpty<I>() and isLastArgument<I>()>::type
   print(std::ostream & out) const
   {
-    out << typeName<Argument<I>>() << " = " << std::get<I>(args);
+    out << typeName<Argument<I>>() << " = " << std::get<I>(args).get();
   }
 
   template<std::size_t I = 0>
   typename std::enable_if<isEmpty<I>()>::type
-  print(std::ostream &) const {}
+  print(std::ostream &) const
+  {}
 
   friend
   std::ostream & operator<<(std::ostream & out, const ArgumentsPrinter & printer)
@@ -65,7 +67,7 @@ private:
 };
 
 template<typename... Args>
-ArgumentsPrinter<Args...> arguments(Args... args)
+ArgumentsPrinter<Args...> arguments(const Args &... args)
 {
-  return ArgumentsPrinter<Args...>(std::move(args)...);
+  return ArgumentsPrinter<Args...>(args...);
 }

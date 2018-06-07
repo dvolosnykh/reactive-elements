@@ -1,7 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include "ArgumentsPrinter.hpp"
+#include <iostream>
 
 
 struct TracerBase {};
