@@ -63,3 +63,9 @@ private:
 private:
   Arguments args;
 };
+
+template<typename... Args>
+ArgumentsPrinter<Args...> arguments(Args... args)
+{
+  return ArgumentsPrinter<Args...>(std::move(args)...);
+}

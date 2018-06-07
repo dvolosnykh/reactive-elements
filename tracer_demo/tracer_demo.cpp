@@ -9,7 +9,7 @@ struct A
   A() = default;
   A(int i, float f, std::string s)
   {
-    std::cout << "  " << ArgumentsPrinter<decltype(i), decltype(f), decltype(s)>(i, f, s) << std::endl;
+    std::cout << "  " << arguments(i, f, s) << std::endl;
   }
 };
 #define A Tracer<A>
