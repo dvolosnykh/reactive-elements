@@ -6,7 +6,7 @@
 
 
 template<typename... Args>
-class ArgumentsPrinter
+class FunctionArguments
 {
   using Arguments = std::tuple<std::reference_wrapper<const Args>...>;
 
@@ -14,7 +14,7 @@ class ArgumentsPrinter
   using Argument = typename std::tuple_element<I, Arguments>::type::type;
 
 public:
-  explicit ArgumentsPrinter(const Args &... args)
+  explicit FunctionArguments(const Args &... args)
     : args(std::cref(args)...)
   {}
 
@@ -23,17 +23,11 @@ public:
 private:
   template<std::size_t I>
   static constexpr
-  bool isEmpty()
-  {
-    return std::tuple_size<Arguments>::value == 0;
-  }
+  bool isEmpty() { return std::tuple_size<Arguments>::value == 0; }
 
   template<std::size_t I>
   static constexpr
-  bool isLastArgument()
-  {
-    return I >= std::tuple_size<Arguments>::value - 1;
-  }
+  bool isLastArgument() { return I >= std::tuple_size<Arguments>::value - 1; }
 
   template<std::size_t I = 0>
   typename std::enable_if<not isEmpty<I>() and not isLastArgument<I>()>::type
@@ -56,7 +50,7 @@ private:
   {}
 
   friend
-  std::ostream & operator<<(std::ostream & out, const ArgumentsPrinter & printer)
+  std::ostream & operator<<(std::ostream & out, const FunctionArguments & printer)
   {
     printer(out);
     return out;
@@ -67,7 +61,7 @@ private:
 };
 
 template<typename... Args>
-ArgumentsPrinter<Args...> arguments(const Args &... args)
+FunctionArguments<Args...> arguments(const Args &... args)
 {
-  return ArgumentsPrinter<Args...>(args...);
+  return FunctionArguments<Args...>(args...);
 }

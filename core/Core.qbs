@@ -7,7 +7,7 @@ CommonProduct {
 
   files: [
     "typename.hpp",
-    "ArgumentsPrinter.hpp",
+    "FunctionArguments.hpp",
     "Subject.hpp",
     "Tracer.hpp"
   ]

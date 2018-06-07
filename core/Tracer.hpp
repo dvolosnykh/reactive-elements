@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ArgumentsPrinter.hpp"
+#include "FunctionArguments.hpp"
 #include <iostream>
 
 
@@ -23,7 +23,7 @@ public:
   {
     std::cout << "[" << *this
       << " constructed with ("
-      << ArgumentsPrinter<Args...>(args...)
+      << arguments(args...)
       << ")]" << std::endl;
   }
 
