@@ -32,12 +32,12 @@ struct B
   {
     std::cout << "  implementation of B copy-constructor" << std::endl;
   }
-  B & operator = (B &&)
+  B & operator=(B &&)
   {
     std::cout << "  implementation of B move-assignment" << std::endl;
     return *this;
   }
-  B & operator = (const B &)
+  B & operator=(const B &)
   {
     std::cout << "  implementation of B copy-assignment" << std::endl;
     return *this;
@@ -51,12 +51,12 @@ struct B
   {
     std::cout << "  implementation of B copy-constructor from A" << std::endl;
   }
-  B & operator = (A &&)
+  B & operator=(A &&)
   {
     std::cout << "  implementation of B move-assignment from A" << std::endl;
     return *this;
   }
-  B & operator = (const A &)
+  B & operator=(const A &)
   {
     std::cout << "  implementation of B copy-assignment from A" << std::endl;
     return *this;
@@ -70,8 +70,8 @@ struct V
   V(std::vector<int> &&) {}
   V(const std::vector<int> &) {}
 
-  V & operator = (std::vector<int> &&) { return *this; }
-  V & operator = (const std::vector<int> &) { return *this; }
+  V & operator=(std::vector<int> &&) { return *this; }
+  V & operator=(const std::vector<int> &) { return *this; }
 };
 #define V Tracer<V>
 

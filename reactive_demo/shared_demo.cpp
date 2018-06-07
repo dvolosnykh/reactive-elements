@@ -1,7 +1,7 @@
 #include <core/Subject.hpp>
 #include <iostream>
 
-struct Tracer
+struct Printer
 {
   void operator()(std::size_t value) const
   {
@@ -23,13 +23,13 @@ try
   });
   subject.attach(another_print);
 
-  Tracer printer;
+  Printer printer;
   const auto binded_printer = subject.createObserver(
-    std::bind(&Tracer::operator(), &printer, std::placeholders::_1)
+    std::bind(&Printer::operator(), &printer, std::placeholders::_1)
   );
   subject.attach(binded_printer);
   const auto another_binded_printer = subject.createObserver(
-    std::bind(&Tracer::operator(), &printer, std::placeholders::_1)
+    std::bind(&Printer::operator(), &printer, std::placeholders::_1)
   );
   subject.attach(another_binded_printer);
 
