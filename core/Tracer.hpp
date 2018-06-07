@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FunctionArguments.hpp"
-#include <iostream>
 
 
 struct TracerBase {};

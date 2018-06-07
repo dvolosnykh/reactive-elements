@@ -1,5 +1,4 @@
 #include <core/Tracer.hpp>
-#include <iostream>
 #include <vector>
 
 // NOTE: Assume each of the types below is included from separate header file.
