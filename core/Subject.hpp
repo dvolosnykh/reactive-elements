@@ -17,7 +17,7 @@ namespace detail
   // which does.
   template<typename Observer>
   inline
-  const Observer & compareAgent(const Observer & observer)
+  Observer const & compareAgent(Observer const & observer)
   {
     return observer;
   }
@@ -25,20 +25,20 @@ namespace detail
   // NOTE: Such implementation of compareAgent() leads to a subtle effect
   // of detaching not only the observer in question but all the observers
   // of the same type. In case of extensive lambdas usage this does not
-  // pose any problems since each lambda has its own type. Thus effectively
+  // pose any problems since each lambda has its own type, thus effectively
   // erasing any difference between types and objects. The strange behaviour
   // appears while using object created as a result of calling std::bind,
   // for example. Even in this case, you may consider using lambda instead.
   template<typename... Args>
   inline
-  const std::type_info & compareAgent(const Reaction<Args...> & observer)
+  std::type_info const & compareAgent(Reaction<Args...> const & observer)
   {
     return observer.target_type();
   }
 
   template<typename Observer>
   inline
-  Observer * compareAgent(const std::weak_ptr<Observer> & observer)
+  Observer * compareAgent(std::weak_ptr<Observer> const & observer)
   {
     return observer.lock().get();
   }
@@ -49,18 +49,16 @@ namespace detail
   // in an appropriate manner.
   template<typename Observer, typename... Args>
   inline
-  void apply(const Observer & observer, Args &&... args)
+  void apply(Observer const & observer, Args ... args)
   {
     observer(std::forward<Args>(args)...);
   }
 
-  // NOTE: For some reason deduction fails if args is declared as Args && like in all
-  // other similar places.
   template<typename Observer, typename... Args>
   inline
-  void apply(const std::weak_ptr<Observer> & observer, Args... args)
+  void apply(std::weak_ptr<Observer> const & observer, Args... args)
   {
-    if (const auto o = observer.lock()) {
+    if (auto const o = observer.lock()) {
       (*o)(std::forward<Args>(args)...);
     }
   }
@@ -72,7 +70,7 @@ namespace detail
   public:
     using ObserverType = Observer;
 
-    void attach(const Observer & observer)
+    void attach(Observer const & observer)
     {
       m_observers.emplace_back(observer);
     }
@@ -82,12 +80,12 @@ namespace detail
       m_observers.emplace_back(std::move(observer));
     }
 
-    void detach(const Observer & observer)
+    void detach(Observer const & observer)
     {
-      const auto & detached_agent = compareAgent(observer);
+      auto const & detached_agent = compareAgent(observer);
 
       // SUGGESTION: remove_if algorithm may be replaced with an alternative
-      // one which moves only part of elements in order to fill 'holes'
+      // one which moves only some of the elements in order to fill 'holes'
       // resulting from previously removed elements. Thus, order of
       // elements guarantee will be lost. The advantage, though, is
       // that the number of moved elements may decrease drastically.
@@ -95,7 +93,7 @@ namespace detail
       // movable. In this case less copies will be made.
       auto erase_iter = std::remove_if(
         std::begin(m_observers), std::end(m_observers),
-        [&detached_agent] (const Observer & current) {
+        [&detached_agent] (Observer const & current) {
           return compareAgent(current) == detached_agent;
         }
       );
@@ -105,9 +103,9 @@ namespace detail
       m_observers.shrink_to_fit();
     }
 
-    void notify(Args &&... args) const
+    void notify(Args ... args) const
     {
-      for (const auto & observer : m_observers) {
+      for (auto const & observer : m_observers) {
         apply(observer, args...);
       }
     }
@@ -143,11 +141,11 @@ public:
 
 private:
   Subject & subject;
-  const typename Subject::ObserverType observer;
+  typename Subject::ObserverType const observer;
 };
 
 template<typename Subject, typename Observer>
-AttachGuard<Subject> makeAttachGuard(Subject & subject, const Observer & observer)
+AttachGuard<Subject> makeAttachGuard(Subject & subject, Observer const & observer)
 {
   return AttachGuard<Subject>(subject, observer);
 }
@@ -167,6 +165,7 @@ namespace shared
     using Base = detail::Subject<std::weak_ptr<detail::Reaction<Args...>>, Args...>;
 
   public:
+    using ObserverType = typename Base::ObserverType::element_type;
     // NOTE: This method may technically be static, but it is declared const instead
     // in order to force its usage via existing Subject instances instead of
     // class name qualified invokations.
@@ -178,7 +177,7 @@ namespace shared
       return std::make_shared<decltype(f)>(std::move(f));
     }
 
-    void notify(Args &&... args) const
+    void notify(Args ... args) const
     {
       Base::notify(std::move(args)...);
       const_cast<Subject*>(this)->removeExpiredObservers();
@@ -190,8 +189,8 @@ namespace shared
       auto & observers = this->m_observers;
       auto erase_iter = std::remove_if(
         std::begin(observers), std::end(observers),
-        [] (const typename Base::ObserverType & observer_weak) {
-          const auto observer = observer_weak.lock();
+        [] (typename Base::ObserverType const & observer_weak) {
+          auto const observer = observer_weak.lock();
           return not observer;
         }
       );

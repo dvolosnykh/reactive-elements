@@ -8,13 +8,13 @@
 template<typename... Args>
 class FunctionArguments
 {
-  using Arguments = std::tuple<std::reference_wrapper<const Args>...>;
+  using Arguments = std::tuple<std::reference_wrapper<Args const>...>;
 
   template<std::size_t I>
   using Argument = typename std::tuple_element<I, Arguments>::type::type;
 
 public:
-  explicit FunctionArguments(const Args &... args)
+  explicit FunctionArguments(Args const &... args)
     : args(std::cref(args)...)
   {}
 
@@ -50,7 +50,7 @@ private:
   {}
 
   friend
-  std::ostream & operator<<(std::ostream & out, const FunctionArguments & printer)
+  std::ostream & operator<<(std::ostream & out, FunctionArguments const & printer)
   {
     printer(out);
     return out;
@@ -61,7 +61,7 @@ private:
 };
 
 template<typename... Args>
-FunctionArguments<Args...> arguments(const Args &... args)
+FunctionArguments<Args...> arguments(Args const &... args)
 {
   return FunctionArguments<Args...>(args...);
 }

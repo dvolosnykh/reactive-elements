@@ -42,7 +42,7 @@ public:
       << other << "]" << std::endl;
   }
 
-  Tracer(const Tracer & other)
+  Tracer(Tracer const & other)
     : T(other)
   {
     std::cout << "[" << *this
@@ -59,7 +59,7 @@ public:
     return *this;
   }
 
-  Tracer & operator=(const Tracer & other)
+  Tracer & operator=(Tracer const & other)
   {
     T::operator=(other);
     std::cout << "[" << *this
@@ -81,7 +81,7 @@ public:
   }
 
   template<typename U>
-  Tracer(const Tracer<U> & other)
+  Tracer(Tracer<U> const & other)
     : T(other)
   {
     std::cout << "[" << *this
@@ -100,7 +100,7 @@ public:
   }
 
   template<typename U>
-  Tracer & operator=(const Tracer<U> & other)
+  Tracer & operator=(Tracer<U> const & other)
   {
     T::operator=(other);
     std::cout << "[" << *this
@@ -129,7 +129,7 @@ public:
     typename = typename std::enable_if<
       not std::is_base_of<TracerBase, U>::value
     >::type>
-  Tracer(const U & other)
+  Tracer(U const & other)
     : T(other)
   {
     std::cout << "[" << *this
@@ -155,7 +155,7 @@ public:
     typename = typename std::enable_if<
       not std::is_base_of<TracerBase, U>::value
     >::type>
-  Tracer & operator=(const U & other)
+  Tracer & operator=(U const & other)
   {
     T::operator=(other);
     std::cout << "[" << *this
@@ -166,19 +166,19 @@ public:
 
 private:
   friend
-  std::ostream & operator<<(std::ostream & out, const Tracer & tracer)
+  std::ostream & operator<<(std::ostream & out, Tracer const & tracer)
   {
     return out << tracer.name << "." << tracer.id;
   }
 
 private:
-  static const std::string name;
+  static std::string const name;
   static std::size_t counter;
-  const decltype(counter) id{++counter};
+  decltype(counter) const id{++counter};
 };
 
 template<typename T>
-const std::string Tracer<T>::name = typeName<T>();
+std::string const Tracer<T>::name = typeName<T>();
 
 template<typename T>
 std::size_t Tracer<T>::counter = 0;
