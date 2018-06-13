@@ -6,7 +6,7 @@ struct Printer
 {
   void operator()(std::size_t const value) const
   {
-    std::cout << "Printer: " << value << std::endl;
+    std::cout << value << " - Printer" << std::endl;
   }
 };
 
@@ -23,7 +23,7 @@ try
 #endif
 
   auto const print = subject.createObserver([] (std::size_t const value) {
-    std::cout << "Lambda: " << value << std::endl;
+    std::cout << value << " - Lambda" << std::endl;
   });
 
   {
@@ -34,7 +34,7 @@ try
 
   subject.attach(print);
   auto const another_print = subject.createObserver([] (std::size_t const value) {
-    std::cout << "Lambda: " << value << std::endl;
+    std::cout << value << " - Another lambda" << std::endl;
   });
   subject.attach(another_print);
 
@@ -55,9 +55,9 @@ try
   subject.attach(another_binded_printer);
 
   subject.notify(1);
-  subject.detach(print); // NOTE: another_print stays attached.
+  subject.detach(print); // NOTE: another_print remains attached.
   subject.notify(2);
-  subject.detach(binded_printer); // NOTE: This will detach another_binded_printer too.
+  subject.detach(binded_printer); // NOTE: This will detach another_binded_printer in case of functional style of API.
   subject.notify(3);
   return EXIT_SUCCESS;
 }
