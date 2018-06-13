@@ -68,6 +68,7 @@ namespace detail
   class Subject
   {
   public:
+    using ObserverStoreType = Observer;
     using ObserverType = Observer;
 
     void attach(Observer const & observer)
@@ -156,7 +157,12 @@ AttachGuard<Subject> makeAttachGuard(Subject & subject, Observer const & observe
 namespace functional
 {
   template<typename... Args>
-  class Subject : public detail::Subject<detail::Reaction<Args...>> {};
+  class Subject : public detail::Subject<detail::Reaction<Args...>>
+  {
+  public:
+    // NOTE: This method won't be needed if we commit to functional style of API only.
+    static auto createObserver(detail::Reaction<Args...> f) -> decltype(f) { return f; }
+  };
 }
 
 namespace shared
@@ -168,13 +174,11 @@ namespace shared
 
   public:
     using ObserverType = typename Base::ObserverType::element_type;
-    // NOTE: This method may technically be static, but it is declared const instead
-    // in order to force its usage via existing Subject instances instead of
-    // class name qualified invokations.
-    // Actually, this method is provided for convenience purpose only. One may well
+
+    // This method is provided for convenience purpose only. One may well
     // create observers by calling std::make_shared directly, yet long typing of
     // fully defined type will be required.
-    auto createObserver(detail::Reaction<Args...> f) const -> std::shared_ptr<decltype(f)>
+    static auto createObserver(detail::Reaction<Args...> f) -> std::shared_ptr<decltype(f)>
     {
       return std::make_shared<decltype(f)>(std::move(f));
     }

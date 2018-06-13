@@ -1,17 +1,19 @@
 #include <core/Subject.hpp>
 #include <iostream>
-#include <vector>
+#include <deque>
 
 
+template<template<typename... Args> class S>
 class Element
 {
 private:
-  shared::Subject<std::size_t> subject;
+  S<std::size_t> subject;
 
 public:
-  using Observer = decltype(subject)::ObserverType;
+  using Subject = decltype(subject);
+  using Observer = typename Subject::ObserverType;
 
-  explicit Element(std::size_t const id, std::weak_ptr<Observer> observer)
+  explicit Element(std::size_t const id, typename Subject::ObserverStoreType observer)
     : id(id)
   {
     subject.attach(std::move(observer));
@@ -24,6 +26,7 @@ private:
 };
 
 
+template<typename E, typename O = typename E::Observer>
 class Container
 {
 public:
@@ -39,19 +42,27 @@ public:
   }
 
 private:
-  std::shared_ptr<Element::Observer> const observer{
-    std::make_shared<Element::Observer>(
-      [] (std::size_t const id) {
-        std::cout << "Notification from element " << id << std::endl;
+  std::size_t hit_counter = 0;
+  O const observer{
+    E::Subject::createObserver([this] (std::size_t const id) {
+      hit_counter++;
+      std::cout << "Notification from element " << id << " (hit counter: " << hit_counter << ")" << std::endl;
   })};
-  std::vector<Element> children;
+  std::deque<E> children;
 };
 
 
 int main()
 try
 {
-  Container container;
+#if 1
+  using El = Element<functional::Subject>;
+  Container<El> container;
+#else
+  using El = Element<shared::Subject>;
+  Container<El, std::shared_ptr<El::Observer>> container;
+#endif
+
   for (std::size_t i = 0; i < 5; ++i)
     container.createElement(i);
 
