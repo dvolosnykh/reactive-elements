@@ -2,8 +2,7 @@ import qbs
 
 Project{
   references: [
-    "Functional.qbs",
-    "Shared.qbs",
+    "Basic.qbs",
     "Hierarchy.qbs"
   ]
 }

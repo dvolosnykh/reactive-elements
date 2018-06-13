@@ -1,10 +1,12 @@
 #include <core/Tracer.hpp>
 #include <core/Subject.hpp>
 
+//#define SHARED_API
+
 
 struct Printer
 {
-  void operator()(std::size_t value) const
+  void operator()(std::size_t const value) const
   {
     std::cout << "Printer: " << value << std::endl;
   }
@@ -16,34 +18,42 @@ struct Printer
 int main()
 try
 {
+#ifdef SHARED_API
+  shared::Subject<std::size_t> subject;
+#else
   functional::Subject<std::size_t> subject;
+#endif
 
-  const auto print = [] (std::size_t value) {
+  auto const print = subject.createObserver([] (std::size_t const value) {
     std::cout << "Lambda: " << value << std::endl;
-  };
+  });
 
   {
-    const auto guard = makeAttachGuard(subject, print);
+    auto const guard = makeAttachGuard(subject, print);
     subject.notify(0);
   }
   subject.notify(100); // Should be no output with number 100.
 
   subject.attach(print);
-  const auto another_print = [] (std::size_t value) {
+  auto const another_print = subject.createObserver([] (std::size_t const value) {
     std::cout << "Lambda: " << value << std::endl;
-  };
+  });
   subject.attach(another_print);
 
   Printer printer;
   {
-    const auto guard = makeAttachGuard(subject, printer);
+    auto const guard = makeAttachGuard(subject, subject.createObserver(printer));
     subject.notify(200);
   }
   subject.notify(300);
 
-  const auto binded_printer = std::bind(&Printer::operator(), &printer, std::placeholders::_1);
+  auto const binded_printer = subject.createObserver(
+    std::bind(&Printer::operator(), &printer, std::placeholders::_1)
+  );
   subject.attach(binded_printer);
-  const auto another_binded_printer = std::bind(&Printer::operator(), &printer, std::placeholders::_1);
+  auto const another_binded_printer = subject.createObserver(
+    std::bind(&Printer::operator(), &printer, std::placeholders::_1)
+  );
   subject.attach(another_binded_printer);
 
   subject.notify(1);
@@ -53,7 +63,7 @@ try
   subject.notify(3);
   return EXIT_SUCCESS;
 }
-catch (const std::exception &error)
+catch (std::exception const & error)
 {
   std::cerr << "Unhandled error: " << error.what() << std::endl;
   return EXIT_FAILURE;

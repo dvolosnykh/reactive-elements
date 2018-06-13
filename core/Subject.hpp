@@ -130,7 +130,7 @@ template<typename Subject>
 class AttachGuard
 {
 public:
-  AttachGuard(Subject & subject, typename Subject::ObserverType observer)
+  AttachGuard(Subject & subject, typename Subject::ObserverStoreType observer)
     : subject(subject)
     , observer(std::move(observer))
   {
@@ -144,7 +144,7 @@ public:
 
 private:
   Subject & subject;
-  typename Subject::ObserverType const observer;
+  typename Subject::ObserverStoreType const observer;
 };
 
 template<typename Subject, typename Observer>
@@ -195,7 +195,7 @@ namespace shared
       auto & observers = this->m_observers;
       auto erase_iter = std::remove_if(
         std::begin(observers), std::end(observers),
-        [] (typename Base::ObserverType const & observer_weak) {
+        [] (typename Subject::ObserverStoreType const & observer_weak) {
           auto const observer = observer_weak.lock();
           return not observer;
         }
