@@ -59,7 +59,7 @@ private:
 int main()
 try
 {
-#if 1
+#ifndef SHARED_API
   using El = Element<functional::Subject>;
   Container<El> container;
 #else

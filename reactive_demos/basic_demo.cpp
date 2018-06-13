@@ -1,8 +1,6 @@
 #include <core/Tracer.hpp>
 #include <core/Subject.hpp>
 
-//#define SHARED_API
-
 
 struct Printer
 {
@@ -18,10 +16,10 @@ struct Printer
 int main()
 try
 {
-#ifdef SHARED_API
-  shared::Subject<std::size_t> subject;
-#else
+#ifndef SHARED_API
   functional::Subject<std::size_t> subject;
+#else
+  shared::Subject<std::size_t> subject;
 #endif
 
   auto const print = subject.createObserver([] (std::size_t const value) {
