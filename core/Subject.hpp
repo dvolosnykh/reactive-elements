@@ -51,7 +51,7 @@ namespace detail
   inline
   void apply(Observer const & observer, Args ... args)
   {
-    observer(std::forward<Args>(args)...);
+    observer(std::move(args)...);
   }
 
   template<typename Observer, typename... Args>
@@ -59,7 +59,7 @@ namespace detail
   void apply(std::weak_ptr<Observer> const & observer, Args... args)
   {
     if (auto const o = observer.lock()) {
-      (*o)(std::forward<Args>(args)...);
+      (*o)(std::move(args)...);
     }
   }
 
@@ -177,7 +177,7 @@ namespace shared
       return std::make_shared<decltype(f)>(std::move(f));
     }
 
-    void notify(Args ... args) const
+    void notify(Args... args) const
     {
       Base::notify(std::move(args)...);
       const_cast<Subject*>(this)->removeExpiredObservers();
