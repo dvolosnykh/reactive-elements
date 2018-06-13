@@ -49,22 +49,22 @@ namespace detail
   // in an appropriate manner.
   template<typename Observer, typename... Args>
   inline
-  void apply(Observer const & observer, Args ... args)
+  void apply(Observer const & observer, Args &&... args)
   {
-    observer(std::move(args)...);
+    observer(std::forward<Args>(args)...);
   }
 
   template<typename Observer, typename... Args>
   inline
-  void apply(std::weak_ptr<Observer> const & observer, Args... args)
+  void apply(std::weak_ptr<Observer> const & observer, Args &&... args)
   {
     if (auto const o = observer.lock()) {
-      (*o)(std::move(args)...);
+      (*o)(std::forward<Args>(args)...);
     }
   }
 
 
-  template<typename Observer, typename... Args>
+  template<typename Observer>
   class Subject
   {
   public:
@@ -103,10 +103,12 @@ namespace detail
       m_observers.shrink_to_fit();
     }
 
-    void notify(Args ... args) const
+    // TODO: Check statically if Args are supported by Observer.
+    template<typename... Args>
+    void notify(Args &&... args) const
     {
       for (auto const & observer : m_observers) {
-        apply(observer, args...);
+        apply(observer, std::forward<Args>(args)...);
       }
     }
 
@@ -154,15 +156,15 @@ AttachGuard<Subject> makeAttachGuard(Subject & subject, Observer const & observe
 namespace functional
 {
   template<typename... Args>
-  class Subject : public detail::Subject<detail::Reaction<Args...>, Args...> {};
+  class Subject : public detail::Subject<detail::Reaction<Args...>> {};
 }
 
 namespace shared
 {
   template<typename... Args>
-  class Subject : public detail::Subject<std::weak_ptr<detail::Reaction<Args...>>, Args...>
+  class Subject : public detail::Subject<std::weak_ptr<detail::Reaction<Args...>>>
   {
-    using Base = detail::Subject<std::weak_ptr<detail::Reaction<Args...>>, Args...>;
+    using Base = detail::Subject<std::weak_ptr<detail::Reaction<Args...>>>;
 
   public:
     using ObserverType = typename Base::ObserverType::element_type;
