@@ -1,13 +1,12 @@
 import qbs
 
 CommonProduct {
-  name: "hierarchy_demo"
+  name: "shared_demo"
   type: "application"
-  consoleApplication: true
 
   Depends { name: "core" }
 
   files: [
-    "hierarchy_demo.cpp"
+    "shared_demo.cpp"
   ]
 }

@@ -13,7 +13,7 @@ Project {
   qbsSearchPaths: "."
   references: [
     "core/Core.qbs",
-    "reactive_demo/ReactiveDemo.qbs",
+    "reactive_demos/ReactiveDemos.qbs",
     "tracer_demo/TracerDemo.qbs"
   ]
 }

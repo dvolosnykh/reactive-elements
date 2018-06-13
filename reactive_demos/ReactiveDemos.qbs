@@ -4,6 +4,7 @@ Project{
   references: [
     "Functional.qbs",
     "Shared.qbs",
-    "Hierarchy.qbs"
+    "FunctionalHierarchy.qbs",
+    "SharedHierarchy.qbs"
   ]
 }
