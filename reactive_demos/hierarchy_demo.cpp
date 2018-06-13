@@ -30,6 +30,14 @@ template<typename E, typename O = typename E::Observer>
 class Container
 {
 public:
+  Container()
+    : observer{
+        E::Subject::createObserver([this] (std::size_t const id) {
+          hit_counter++;
+          std::cout << "Notification from element " << id << " (hit counter: " << hit_counter << ")" << std::endl;
+      })}
+  {}
+
   void createElement(std::size_t const id)
   {
     children.emplace_back(id, observer);
@@ -43,11 +51,7 @@ public:
 
 private:
   std::size_t hit_counter = 0;
-  O const observer{
-    E::Subject::createObserver([this] (std::size_t const id) {
-      hit_counter++;
-      std::cout << "Notification from element " << id << " (hit counter: " << hit_counter << ")" << std::endl;
-  })};
+  O const observer;
   std::deque<E> children;
 };
 
