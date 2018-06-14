@@ -6,15 +6,22 @@ CommonProduct {
   type: "staticlibrary"
 
   files: [
-    "typename.hpp",
     "FunctionArguments.hpp",
     "Subject.hpp",
-    "Tracer.hpp"
+    "Tracer.hpp",
+    "typename.hpp"
   ]
 
   Export {
     Depends { name: "cpp" }
-    Depends { name: "boost" }
+    Depends {
+      condition: project.use_boost
+      name: "boost"
+    }
+    Properties {
+      condition: project.use_boost
+      cpp.defines: ["USE_BOOST"]
+    }
     cpp.includePaths: FileInfo.joinPaths(product.sourceDirectory, "..")
   }
 }

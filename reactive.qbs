@@ -1,6 +1,8 @@
 import qbs
 
 Project {
+  property bool use_boost: false
+
   Properties {
     condition: qbs.targetOS.contains("macos")
     minimumQbsVersion: "1.5.2"
