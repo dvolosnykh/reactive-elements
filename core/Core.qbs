@@ -3,7 +3,6 @@ import qbs.FileInfo
 
 CommonProduct {
   name: "core"
-  type: "staticlibrary"
 
   files: [
     "FunctionArguments.hpp",
