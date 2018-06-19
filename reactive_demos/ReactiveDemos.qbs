@@ -5,6 +5,7 @@ Project{
 
   references: [
     "Basic.qbs",
-    "Hierarchy.qbs"
+    "Hierarchy.qbs",
+    "Concurrency.qbs"
   ]
 }

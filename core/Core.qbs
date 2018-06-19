@@ -15,7 +15,7 @@ CommonProduct {
     Depends { name: "cpp" }
     Depends {
       condition: project.use_boost
-      name: "boost"
+      name: "Boost.core"
     }
     Properties {
       condition: project.use_boost

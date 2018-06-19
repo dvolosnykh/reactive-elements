@@ -1,6 +1,5 @@
 #include <core/Subject.hpp>
 #include <iostream>
-#include <deque>
 
 
 template<template<typename... Args> class S>
@@ -30,7 +29,7 @@ template<typename E, typename O = typename E::Observer>
 class Container
 {
 public:
-  Container()
+  explicit Container()
     : observer{
         E::Subject::createObserver([this] (std::size_t const id) {
           hit_counter++;
@@ -74,7 +73,7 @@ try
 
   return EXIT_SUCCESS;
 }
-catch (const std::exception &error)
+catch (const std::exception & error)
 {
   std::cerr << "Unhandled error: " << error.what() << std::endl;
   return EXIT_FAILURE;

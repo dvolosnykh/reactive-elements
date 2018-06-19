@@ -1,4 +1,4 @@
-import qbs
+import qbs 1.0
 
 CppApplication {
   cpp.cxxLanguageVersion: "c++11"
