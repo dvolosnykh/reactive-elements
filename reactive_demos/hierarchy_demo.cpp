@@ -2,17 +2,16 @@
 #include <iostream>
 
 
-template<template<typename... Args> class S>
 class Element
 {
 private:
-  S<std::size_t> subject;
+  Subject<std::size_t> subject;
 
 public:
   using Subject = decltype(subject);
-  using Observer = typename Subject::ObserverType;
+  using Observer = typename Subject::Observer;
 
-  explicit Element(std::size_t const id, typename Subject::ObserverStoreType observer)
+  explicit Element(std::size_t const id, Observer observer)
     : id(id)
   {
     subject.attach(std::move(observer));
@@ -25,16 +24,14 @@ private:
 };
 
 
-template<typename E, typename O = typename E::Observer>
 class Container
 {
 public:
   explicit Container()
-    : observer{
-        E::Subject::createObserver([this] (std::size_t const id) {
-          hit_counter++;
-          std::cout << "Notification from element " << id << " (hit counter: " << hit_counter << ")" << std::endl;
-      })}
+    : observer{[this] (std::size_t const id) {
+        hit_counter++;
+        std::cout << "Notification from element " << id << " (hit counter: " << hit_counter << ")" << std::endl;
+      }}
   {}
 
   void createElement(std::size_t const id)
@@ -50,21 +47,15 @@ public:
 
 private:
   std::size_t hit_counter = 0;
-  O const observer;
-  std::deque<E> children;
+  Element::Observer const observer;
+  std::deque<Element> children;
 };
 
 
 int main()
 try
 {
-#ifndef SHARED_API
-  using El = Element<functional::Subject>;
-  Container<El> container;
-#else
-  using El = Element<shared::Subject>;
-  Container<El, std::shared_ptr<El::Observer>> container;
-#endif
+  Container container;
 
   for (std::size_t i = 0; i < 5; ++i)
     container.createElement(i);

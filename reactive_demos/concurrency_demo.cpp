@@ -38,7 +38,7 @@ private:
 private:
   io::io_service & context;
   std::size_t const limit;
-  functional::Subject<std::size_t> subject;
+  Subject<std::size_t> subject;
 };
 
 
