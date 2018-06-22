@@ -8,13 +8,12 @@ private:
   Subject<std::size_t> subject;
 
 public:
-  using Subject = decltype(subject);
-  using Observer = typename Subject::Observer;
+  using Observer = typename decltype(subject)::Observer;
 
-  explicit Element(std::size_t const id, Observer observer)
+  explicit Element(std::size_t const id, Observer const & observer)
     : id(id)
   {
-    subject.attach(std::move(observer));
+    subject.attach(observer);
   }
 
   void notify() const { subject.notify(id); }

@@ -14,7 +14,7 @@ public:
     : context(context)
     , limit(limit)
   {
-    subject.attach([this](std::size_t const counter) {
+    subject.attach([this] (std::size_t const counter) {
       this->context.post([this, counter] {
         std::cout << "Counter: " << counter << std::endl;
         advanceCounter(counter);

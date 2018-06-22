@@ -21,6 +21,8 @@ public:
   void operator()(std::ostream & out) const { print<>(out); }
 
 private:
+  // TODO: All the print-related template stuff below may be simplified
+  // by fold-expressions once C++17 is available.
   template<std::size_t I>
   static constexpr
   bool isEmpty() { return std::tuple_size<Arguments>::value == 0; }
@@ -61,6 +63,7 @@ private:
 };
 
 template<typename... Args>
+inline
 FunctionArguments<Args...> arguments(Args const &... args)
 {
   return FunctionArguments<Args...>(args...);

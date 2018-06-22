@@ -57,6 +57,7 @@ public:
   }
 
   template<typename... NotifyArgs,
+    // NOTE: Following typename is a SFINAE trick that checks if NotifyArgs are compatible with Args.
     typename = typename std::enable_if<
       std::is_convertible<canonical_tuple<Args...>, canonical_tuple<NotifyArgs...>>::value
     >::type>
@@ -95,6 +96,7 @@ private:
 
 // NOTE: This helper method will not be needed once C++17 is used.
 template<typename Subject, typename Observer>
+inline
 AttachGuard<Subject> makeAttachGuard(Subject & subject, Observer const & observer)
 {
   return AttachGuard<Subject>(subject, observer);
