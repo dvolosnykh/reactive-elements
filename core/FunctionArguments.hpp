@@ -18,8 +18,6 @@ public:
     : args(std::cref(args)...)
   {}
 
-  void operator()(std::ostream & out) const { print<>(out); }
-
 private:
   // TODO: All the print-related template stuff below may be simplified
   // by fold-expressions once C++17 is available.
@@ -56,7 +54,7 @@ private:
   friend
   std::ostream & operator<<(std::ostream & out, FunctionArguments const & printer)
   {
-    printer(out);
+    printer.print(out);
     return out;
   }
 
