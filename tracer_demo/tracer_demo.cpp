@@ -6,10 +6,7 @@
 struct A
 {
   A() = default;
-  A(int i, float f, std::string s)
-  {
-    std::cout << "  " << arguments(i, f, s) << std::endl;
-  }
+  A(int i, float f, std::string s) {}
 };
 #define A Tracer<A>
 
