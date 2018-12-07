@@ -35,6 +35,7 @@ private:
   typename std::enable_if<not isEmpty<I>() and not isLastArgument<I>()>::type
   print(std::ostream & out) const
   {
+    // TODO: Detect if i-th argument is printable.
     out << typeName<Argument<I>>() << " = " << std::get<I>(args).get() << ", ";
     print<I + 1>(out);
   }
@@ -43,6 +44,7 @@ private:
   typename std::enable_if<not isEmpty<I>() and isLastArgument<I>()>::type
   print(std::ostream & out) const
   {
+    // TODO: Detect if i-th argument is printable.
     out << typeName<Argument<I>>() << " = " << std::get<I>(args).get();
   }
 
