@@ -7,13 +7,11 @@ namespace io = boost::asio;
 
 
 // TODO: Provide self-describing example instead of some dummy woker below.
-class Worker
-{
+class Worker {
 public:
   explicit Worker(io::io_service & context, std::size_t const limit = 20)
-    : context(context)
-    , limit(limit)
-  {
+    : context(context),
+      limit(limit) {
     subject.attach([this] (std::size_t const counter) {
       this->context.post([this, counter] {
         std::cout << "Counter: " << counter << std::endl;
@@ -25,8 +23,7 @@ public:
   }
 
 private:
-  void advanceCounter(std::size_t const counter)
-  {
+  void advanceCounter(std::size_t const counter) {
     if (counter >= limit)
       return;
 
@@ -43,21 +40,18 @@ private:
 
 
 int main()
-try
-{
+try {
   io::io_service context;
   Worker worker(context);
   context.run();
 
   return EXIT_SUCCESS;
 }
-catch (const std::exception & error)
-{
+catch (std::exception const& error) {
   std::cerr << "Unhandled error: " << error.what() << std::endl;
   return EXIT_FAILURE;
 }
-catch (...)
-{
+catch (...) {
   std::cerr << "Unknown unhandled error" << std::endl;
   return EXIT_FAILURE;
 }

@@ -2,17 +2,15 @@
 #include <iostream>
 
 
-class Element
-{
+class Element {
 private:
   Subject<std::size_t> subject;
 
 public:
   using Observer = typename decltype(subject)::Observer;
 
-  explicit Element(std::size_t const id, Observer const & observer)
-    : id(id)
-  {
+  explicit Element(std::size_t const id, Observer const& observer)
+    : id(id) {
     subject.attach(observer);
   }
 
@@ -23,8 +21,7 @@ private:
 };
 
 
-class Container
-{
+class Container {
 public:
   explicit Container()
     : observer{[this] (std::size_t const id) {
@@ -33,14 +30,12 @@ public:
       }}
   {}
 
-  void createElement(std::size_t const id)
-  {
+  void createElement(std::size_t const id) {
     children.emplace_back(id, observer);
   }
 
-  void triggerElements()
-  {
-    for (auto const & child : children)
+  void triggerElements() {
+    for (auto const& child : children)
       child.notify();
   }
 
@@ -52,24 +47,22 @@ private:
 
 
 int main()
-try
-{
+try {
   Container container;
 
-  for (std::size_t i = 0; i < 5; ++i)
+  for (std::size_t i = 0; i < 5; ++i) {
     container.createElement(i);
+  }
 
   container.triggerElements();
 
   return EXIT_SUCCESS;
 }
-catch (const std::exception & error)
-{
+catch (std::exception const& error) {
   std::cerr << "Unhandled error: " << error.what() << std::endl;
   return EXIT_FAILURE;
 }
-catch (...)
-{
+catch (...) {
   std::cerr << "Unknown unhandled error" << std::endl;
   return EXIT_FAILURE;
 }

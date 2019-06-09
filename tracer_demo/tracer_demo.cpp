@@ -3,78 +3,66 @@
 
 // NOTE: Assume each of the types below is included from separate header file.
 
-struct A
-{
+struct A {
   A() = default;
-  A(int i, float f, std::string s) {}
+  A(int i, float f, std::string s) {
+    std::cout << "  " << arguments(i, f, s) << std::endl;
+  }
 };
 #define A Tracer<A>
 
-struct B
-{
-  B()
-  {
+struct B {
+  B() {
     std::cout << "  implementation of B default-constructor" << std::endl;
   }
-  ~B()
-  {
+  ~B() {
     std::cout << "  implementation of B destructor" << std::endl;
   }
 
-  B(B &&)
-  {
+  B(B &&) {
     std::cout << "  implementation of B move-constructor" << std::endl;
   }
-  B(const B &)
-  {
+  B(B const&) {
     std::cout << "  implementation of B copy-constructor" << std::endl;
   }
-  B & operator=(B &&)
-  {
+  B & operator=(B &&) {
     std::cout << "  implementation of B move-assignment" << std::endl;
     return *this;
   }
-  B & operator=(const B &)
-  {
+  B & operator=(B const&) {
     std::cout << "  implementation of B copy-assignment" << std::endl;
     return *this;
   }
 
-  B(A &&)
-  {
+  B(A &&) {
     std::cout << "  implementation of B move-constructor from A" << std::endl;
   }
-  B(const A &)
-  {
+  B(A const&) {
     std::cout << "  implementation of B copy-constructor from A" << std::endl;
   }
-  B & operator=(A &&)
-  {
+  B & operator=(A &&) {
     std::cout << "  implementation of B move-assignment from A" << std::endl;
     return *this;
   }
-  B & operator=(const A &)
-  {
+  B & operator=(A const&) {
     std::cout << "  implementation of B copy-assignment from A" << std::endl;
     return *this;
   }
 };
 #define B Tracer<B>
 
-struct V
-{
+struct V {
   V() = default;
   V(std::vector<int> &&) {}
-  V(const std::vector<int> &) {}
+  V(std::vector<int> const&) {}
 
   V & operator=(std::vector<int> &&) { return *this; }
-  V & operator=(const std::vector<int> &) { return *this; }
+  V & operator=(std::vector<int> const&) { return *this; }
 };
 #define V Tracer<V>
 
 
-int main()
-{
+int main() {
   {
     std::cout << "\n--- Solo demo for traced type ---\n" << std::endl;
     A a1;

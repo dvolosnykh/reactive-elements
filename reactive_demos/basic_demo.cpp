@@ -5,10 +5,8 @@
 using namespace std::placeholders;
 
 
-struct Printer
-{
-  void operator()(std::size_t const value) const
-  {
+struct Printer {
+  void operator()(std::size_t const value) const {
     std::cout << value << " - Printer" << std::endl;
   }
 };
@@ -17,8 +15,7 @@ struct Printer
 
 
 int main()
-try
-{
+try {
   Subject<std::size_t> subject;
 
   auto const print = [] (std::size_t const value) {
@@ -26,7 +23,7 @@ try
   };
 
   {
-    auto const guard = makeAttachGuard(subject, print);
+    auto const guard = make_attach_guard(subject, print);
     subject.notify(0);
   }
   subject.notify(100); // Should be no output with number 100.
@@ -39,7 +36,7 @@ try
 
   Printer printer;
   {
-    auto const guard = makeAttachGuard(subject, printer);
+    auto const guard = make_attach_guard(subject, printer);
     subject.notify(200);
   }
   subject.notify(300);
@@ -56,13 +53,11 @@ try
   subject.notify(3);
   return EXIT_SUCCESS;
 }
-catch (std::exception const & error)
-{
+catch (std::exception const& error) {
   std::cerr << "Unhandled error: " << error.what() << std::endl;
   return EXIT_FAILURE;
 }
-catch (...)
-{
+catch (...) {
   std::cerr << "Unknown unhandled error" << std::endl;
   return EXIT_FAILURE;
 }
